@@ -1,0 +1,127 @@
+CREATE TABLE users (
+    id serial PRIMARY KEY,
+    name VARCHAR(50),
+    user_type VARCHAR
+    );
+
+CREATE TABLE host (
+    id serial PRIMARY KEY,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+);
+
+CREATE TABLE guest (
+    id serial PRIMARY KEY,
+    user_id INT NOT NULL,
+    possibility VARCHAR(50),
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+);
+
+CREATE TABLE reservation (
+    id serial PRIMARY KEY,
+    guest_id INT NOT NULL,
+    free_room_id INT NOT NULL,
+    from_time VARCHAR,
+    to_time VARCHAR,
+    FOREIGN KEY (guest_id)
+        REFERENCES guest (id)   
+);
+
+
+CREATE TABLE rooms (
+    id serial PRIMARY KEY,
+    host_id INT NOT NULL,
+    room_name VARCHAR(50),
+    attributes VARCHAR(50),
+    price INT NOT NULL,
+    status VARCHAR(50),
+    from_time VARCHAR,
+    to_time VARCHAR,
+    FOREIGN KEY (host_id)
+        REFERENCES host (id)
+);
+
+
+CREATE TABLE free_rooms (
+    id serial PRIMARY KEY,
+    room_id INT NOT NULL,
+    FOREIGN KEY (room_id)
+        REFERENCES rooms (id)
+);
+
+CREATE TABLE availability (
+    id serial PRIMARY KEY,
+    guest_id INT NOT NULL,
+    free_room_id INT NOT NULL,
+    FOREIGN KEY (guest_id)
+        REFERENCES guest (id),
+    FOREIGN KEY (free_room_id)
+        REFERENCES free_rooms (id)
+);
+
+INSERT INTO users (name, user_type) VALUES
+('John','host'),
+('Sandra','host'),
+('Lilly','host'),
+('Kate','guest'),
+('Alex','guest'),
+('John','guest');
+
+INSERT INTO host(user_id) VALUES
+(1),
+(2),
+(3);
+
+INSERT INTO guest(user_id, possibility) VALUES
+(4, 'reservation'),
+(5, 'availability'),
+(6, 'reservation'),
+(4, 'reservation');
+
+INSERT INTO rooms (host_id, room_name, attributes, price, status)VALUES
+(1, 'Room 1', 'A', 100, 'Free'),
+(2, 'Room 2', 'A, B', 500, 'Free'),
+(1, 'Room 3', 'A, B, C', 1200, 'Free');
+
+INSERT INTO free_rooms (room_id) VALUES
+(1),
+(2),
+(3);
+
+INSERT INTO availability (guest_id, free_room_id) VALUES
+(2, 1),
+(2, 2),
+(2, 3);
+
+CREATE TABLE reservation (
+    id serial PRIMARY KEY,
+    guest_id INT NOT NULL,
+    free_room_id INT NOT NULL,
+    from_time VARCHAR,
+    to_time VARCHAR,
+    FOREIGN KEY (guest_id)
+        REFERENCES guest (id)   
+);
+
+INSERT INTO reservation (guest_id, free_room_id, from_time, to_time) VALUES
+(1, 1, '25.06.2023', '27.06.2023'),
+(3, 2,'25.06.2023', '28.06.2023'),
+(4, 3,'25.06.2023', '30.06.2023');
+
+UPDATE rooms SET status = 'Occupied';
+
+UPDATE rooms SET from_time = '25.06.2023' WHERE id = 1;
+UPDATE rooms SET to_time = '27.06.2023' WHERE id = 1;
+
+UPDATE rooms SET from_time = '25.06.2023' WHERE id = 2;
+UPDATE rooms SET to_time = '28.06.2023' WHERE id = 2;
+
+UPDATE rooms SET from_time = '25.06.2023' WHERE id = 3;
+UPDATE rooms SET to_time = '30.06.2023' WHERE id = 3;
+
+SELECT users.id, users.name
+FROM users
+INNER JOIN guest 
+ON users.id = guest.user_id;
